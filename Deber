@@ -1,0 +1,130 @@
+# Tarea Semana #3
+### Jessy Suarez Alvarez
+Utilizando los datos sobre la felicidad publicados en español del repositorio de Github https://github.com/cienciadedatos/datos-de-miercoles/tree/master/datos/2019/2019-08-07 van a presentar un reporte que incluya lo siguiente:
+Medida de tendencia central y dispersión de la felicidad a nivel mundial para el primer y último año incluido en el set de datos.
+
+Pueden escoger cualquier medida, por ejemplo, promedio y desviación estándar.
+
+Comparación de valores a nivel mundial con dos países de su elección en el primer año reportado y el último año reportado.
+
+En su código deberán mostrar lo siguiente:
+
+¿Cómo acceden a los datos de la felicidad?
+
+¿Cómo calculan la medida de tendencia central y dispersión a nivel global para el primer y último año incluido en el set de datos?
+
+¿Cómo acceden a la información de la felicidad del primer y último año para los dos países de su elección?
+
+Explicar cómo se comparan los países de su elección con el resto del mundo. Básicamente si son más o menos felices.
+
+Opcional: Si quieren pueden mostrar cómo revisan otras columnas que expliquen por qué los países que eligieron son más o menos felices que el promedio global. Por ejemplo, el país X tiene mejor soporte social que el promedio del mundo y por eso es más feliz.
+
+# Cargar y preparar datos
+import pandas as pd
+#Cargar datos
+data= pd.read_csv('https://raw.githubusercontent.com/cienciadedatos/datos-de-miercoles/master/datos/2019/2019-08-07/felicidad.csv')
+data
+
+#Preparar datos
+data_cl=data.fillna(0)
+data_cl
+
+#Primer y ultimo anio incluido en el set de datos.
+data_first_year=data_cl['anio'].min()
+data_last_year=data_cl['anio'].max()
+print("El primer anio es", data_first_year)
+print('El ultimo anio es',data_last_year)
+
+p_escalera_vida = 0.1
+p_log_pib = 0.1
+p_soporte_social = 0.1
+p_expectativa_vida = 0.1
+p_libertad = 0.1
+p_generosidad = 0.1
+p_percepcion_corrupcion = 0.1
+p_afecto_positivo = 0.1
+p_afecto_negativo = 0.1
+p_confianza = 0.1
+p_calidad_democracia = 0.1
+
+data_cl['Pond_felicidad']= (
+    p_escalera_vida * data_cl['escalera_vida'] +
+    p_log_pib * data_cl['log_pib'] +
+    p_soporte_social * data_cl['soporte_social'] +
+    p_expectativa_vida * data_cl['expectativa_vida'] +
+    p_libertad * data_cl['libertad'] +
+    p_generosidad * data_cl['generosidad'] -
+    p_percepcion_corrupcion * data_cl['percepcion_corrupcion'] +
+    p_afecto_positivo * data_cl['afecto_positivo'] -
+    p_afecto_negativo * data_cl['afecto_negativo'] +
+    p_confianza * data_cl['confianza'] +
+    p_calidad_democracia *data_cl['calidad_democracia'])
+data_cl
+
+#Medidas de tendencia central y dispersión a nivel global
+promedio_global_primer_anio = data_cl[data_cl['anio'] == data_cl['anio'].min()]['Pond_felicidad'].mean()
+desviacion_estandar_global_primer_anio = data_cl[data_cl['anio'] == data_cl['anio'].min()]['Pond_felicidad'].std()
+
+promedio_global_ultimo_anio = data_cl[data_cl['anio'] == data_cl['anio'].max()]['Pond_felicidad'].mean()
+desviacion_estandar_global_ultimo_anio = data_cl[data_cl['anio'] == data_cl['anio'].max()]['Pond_felicidad'].std()
+
+# Acceder a la información de felicidad del primer y último año para dos países de elección 
+pais_1 = 'Estados Unidos'
+pais_2 = 'Ecuador'
+
+felicidad_pais_1_primer_anio = data_cl[(data_cl['anio'] == data_cl['anio'].min()) & (data_cl['pais'] == pais_1)]['Pond_felicidad'].values
+felicidad_pais_2_primer_anio = data_cl[(data_cl['anio'] == data_cl['anio'].min()) & (data_cl['pais'] == pais_2)]['Pond_felicidad'].values
+
+felicidad_pais_1_ultimo_anio = data_cl[(data_cl['anio'] == data_cl['anio'].max()) & (data_cl['pais'] == pais_1)]['Pond_felicidad'].values
+felicidad_pais_2_ultimo_anio = data_cl[(data_cl['anio'] == data_cl['anio'].max()) & (data_cl['pais'] == pais_2)]['Pond_felicidad'].values
+
+# Comparar países de elección con el resto del mundo
+if felicidad_pais_1_primer_anio > promedio_global_primer_anio:
+    comparacion_pais_1_primer_anio = f"{pais_1} es más feliz que el promedio global en el primer año."
+else:
+    comparacion_pais_1_primer_anio = f"{pais_1} es menos feliz que el promedio global en el primer año."
+
+if felicidad_pais_1_ultimo_anio > promedio_global_ultimo_anio:
+    comparacion_pais_1_ultimo_anio = f"{pais_1} es más feliz que el promedio global en el último año."
+else:
+    comparacion_pais_1_ultimo_anio = f"{pais_1} es menos feliz que el promedio global en el último año."
+
+if felicidad_pais_2_primer_anio > promedio_global_primer_anio:
+    comparacion_pais_2_primer_anio = f"{pais_2} es más feliz que el promedio global en el primer año."
+else:
+    comparacion_pais_2_primer_anio = f"{pais_2} es menos feliz que el promedio global en el primer año."
+
+if felicidad_pais_2_ultimo_anio > promedio_global_ultimo_anio:
+    comparacion_pais_2_ultimo_anio = f"{pais_2} es más feliz que el promedio global en el último año."
+else:
+    comparacion_pais_2_ultimo_anio = f"{pais_2} es menos feliz que el promedio global en el último año."
+
+# Imprimir resultados
+print(f"Medida de tendencia central y dispersión a nivel global para el primer año:")
+print(f"Promedio: {promedio_global_primer_anio}")
+print(f"Desviación estándar: {desviacion_estandar_global_primer_anio}\n")
+
+print(f"Medida de tendencia central y dispersión a nivel global para el último año:")
+print(f"Promedio: {promedio_global_ultimo_anio}")
+print(f"Desviación estándar: {desviacion_estandar_global_ultimo_anio}\n")
+
+print(f"Información de felicidad para {pais_1} en el primer año: {felicidad_pais_1_primer_anio}")
+print(f"Información de felicidad para {pais_1} en el último año: {felicidad_pais_1_ultimo_anio}\n")
+
+print(f"Información de felicidad para {pais_2} en el primer año: {felicidad_pais_2_primer_anio}")
+print(f"Información de felicidad para {pais_2} en el último año: {felicidad_pais_2_ultimo_anio}\n")
+
+print(comparacion_pais_1_primer_anio)
+print(comparacion_pais_1_ultimo_anio)
+print(comparacion_pais_2_primer_anio)
+print(comparacion_pais_2_ultimo_anio)
+
+
+
+
+
+
+
+
+
+
